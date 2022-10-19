@@ -15,14 +15,14 @@ int main()
 
     if (num1 > num2)
     {
-        cout << num1 << " больше " << num2 << endl;
+        cout << num1 << " больше " << num2;
     }
     else if (num2 > num1)
     {
-        cout << num2 << " больше " << num1 << endl;
+        cout << num2 << " больше " << num1;
     }
     else{
-        cout << num1 << " равно " << num2 << endl;
+        cout << num1 << " равно " << num2;
     }
 
     return 0;

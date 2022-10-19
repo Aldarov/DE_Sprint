@@ -12,13 +12,13 @@ int main()
     cin >> year;
 
     if (year % 400 == 0)
-        cout << year << " год - високосный." << endl;
+        cout << year << " год - високосный.";
     else if (year % 100 == 0)
-        cout << year << " год - невисокосный." << endl;
+        cout << year << " год - невисокосный.";
     else if (year % 4 == 0)
-        cout << year << " год - високосный." << endl;
+        cout << year << " год - високосный.";
     else
-        cout << year << " год - невисокосный." << endl;
+        cout << year << " год - невисокосный.";
 
     return 0;
 }
