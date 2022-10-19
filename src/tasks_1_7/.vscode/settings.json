@@ -5,6 +5,7 @@
         "*.json": "jsonc",
         "ostream": "cpp",
         "iostream": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "new": "cpp"
     }
 }
