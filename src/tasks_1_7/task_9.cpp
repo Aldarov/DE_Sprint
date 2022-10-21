@@ -20,7 +20,7 @@ float avg(vector<int> values)
     return sum / count;
 }
 
-struct Student
+class Student
 {
     public:
         string fullName;
