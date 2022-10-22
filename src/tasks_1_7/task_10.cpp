@@ -35,54 +35,81 @@ class Train
 
         time_t departureTime;
 
-        int trainNumber;
+        int trainNumber = 0;
 
-        Train(string _destination, time_t _departureTime)
+        Train(string destination, time_t departureTime)
         {
-            destination = _destination;
-            departureTime = _departureTime;
+            this->destination = destination;
+            this->departureTime = departureTime;
+        }
+
+        setTrainNumber(int number)
+        {
+            this->trainNumber = number;
         }
 };
+
+time_t getTime(tm time)
+{
+    return mktime(&time);
+}
 
 vector<Train> initTrains()
 {
     vector<Train> res;
 
-    // struct tm my_time = { .tm_year = 2022 - 1900, .tm_mon = 9, .tm_mday = 1, .tm_hour = 8, .tm_min = 0 };
-    struct tm my_time = { .tm_min = 0, .tm_hour = 8, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 };
-    // res.push_back(Train("Train 1", mktime(&my_time)));
-    res.push_back(Train("Train 1", mktime(&tm{ .tm_min = 0, .tm_hour = 8, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
-    // res.push_back(Train("Train 1", mktime(tm{tm_year = 2022, tm_mon = 9, tm_mday = 1, tm_hour = 9, tm_min = 0 })));
+    res.push_back(Train("destination 1", getTime({ .tm_min = 0, .tm_hour = 12, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
+    res.push_back(Train("destination 2", getTime({ .tm_min = 0, .tm_hour = 11, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
+    res.push_back(Train("destination 1", getTime({ .tm_min = 0, .tm_hour = 9, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
+    res.push_back(Train("destination 4", getTime({ .tm_min = 0, .tm_hour = 7, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
+    res.push_back(Train("destination 3", getTime({ .tm_min = 0, .tm_hour = 16, .tm_mday = 1, .tm_mon = 9 - 1, .tm_year = 2022 - 1900 })));
 
     return res;
 }
 
-// struct {
-//     bool operator() (Student a, Student b) const
-//     {
-//         return a.avgMark() < b.avgMark();
-//     }
-// } StudentLess;
+void setTrainNumbers(vector<Train> &trains)
+{
+  for (int i = 0; i < trains.size(); i++)
+  {
+    cout << "Поезд отправляется в \"" << trains[i].destination << "\" - " << timeToString(&trains[i].departureTime) << "\n";
+    cout << "Введите номер поезда: ";
+    int number;
+    cin >> number;
+    trains[i].setTrainNumber(number);
+  }
+}
 
-// void showStudentsOnlyWith45(vector<Student> students)
-// {
-//   for (int i = 0; i < students.size(); i++)
-//   {
-//     if (students[i].isAllMarks(4) or students[i].isAllMarks(5))
-//         cout << students[i].fullName << " - " << students[i].group << " гр.\n";
-//   }
-// }
+void showTrains(vector<Train> trains)
+{
+  for (int i = 0; i < trains.size(); i++)
+  {
+    cout << "Поезд № " << trains[i].trainNumber << " отправляется в \"" << trains[i].destination << "\" - " << timeToString(&trains[i].departureTime) << "\n";
+  }
+}
+
+struct {
+    bool operator() (Train a, Train b) const
+    {
+        if (a.destination < b.destination)
+            return true;
+        else if ((a.destination == b.destination) and (a.departureTime < b.departureTime))
+            return true;
+        else
+            return false;
+    }
+} TrainsLess;
 
 int main()
 {
     setlocale(LC_ALL, "");
 
-    vector<Train> trans = initTrains();
+    vector<Train> trains = initTrains();
 
-    // sort(students.begin(), students.end(), StudentLess);
+    setTrainNumbers(trains);
 
-    // showStudentsOnlyWith45(students);
+    sort(trains.begin(), trains.end(), TrainsLess);
 
-    string time = timeToString(&trans[0].departureTime);
+    showTrains(trains);
+
     return 0;
 }
