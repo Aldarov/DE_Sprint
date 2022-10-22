@@ -1,0 +1,198 @@
+Практические задания
+В практической работе рассмотрим основные принципы работы и инструменты мониторинга Kafka.
+
+Для успешной работы с Kafka потребуется установить дополнительное ПО на вашем компьютере:
+1. Docker – переходим по ссылке (Docker), выбираем дистрибутив согласно вашей операционной системе, скачиваем и устанавливаем.
+2. Для проверки установки docker:
+
+Пользователи ОС Windows – вызываем командную строку и вводим команду docker –version
+Пользователи ОС Linux, MacOS – вызываем терминал и вводим команду docker –version
+В результате должно получиться что-то похожее:
+Docker version 20.10.17, build 100с701
+
+3. После запуска docker у пользователей ОС Windows может возникнут проблема:
+
+Для устранения данной ошибки необходимо обновить WSL и для дальнейшей более комфортной работы над практическими работами установите дистрибутив Linux, который полностью интегрирован с операционной системой Windows.
+Более подробную информацию можно найти по ссылке: https://learn.microsoft.com/ru-ru/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
+Действия по установке для старых версий WSL вручную: https://learn.microsoft.com/ru-ru/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
+
+Информация по работе с файловыми системами: https://learn.microsoft.com/ru-ru/windows/wsl/filesystems
+
+Работа в файловых системах Windows и Linux: https://learn.microsoft.com/ru-ru/windows/wsl/filesystems
+
+
+4. Для мониторинга kafka потребуется установка kafkacat используем команды:
+
+sudo apt update
+
+sudo apt install kafkacat
+
+Пользователи ОС Linux, MacOS – вызываем терминал и вводим команду docker –version
+
+Подробно со всеми командами kafkacat можно ознакомиться в официальной документации (https://docs.confluent.io/platform/current/app-development/kafkacat-usage.html#producer-mode)
+
+
+Задание
+
+1. Создадим исполнительный файл docker-compose (докер композер)
+
+Заходим в терминал
+
+С помощью команды mkdir создадим директорию kafka
+
+windows: md kafka *(если у вас установлен дистрибутив Linux для Windows см. ниже)
+
+ubuntu: mkdir kafka
+
+Переходим в данную директорию с помощью команды: cd kafka
+
+В заданной директории kafka, создаем файл docker-compose.yml c поомщью команды ls со следующим содержимым:
+
+---
+
+version: '3'
+
+services:
+
+  zookeeper:
+
+    image: confluentinc/cp-zookeeper:7.0.1
+
+    container_name: zookeeper
+
+    environment:
+
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+      ZOOKEEPER_TICK_TIME: 2000
+
+  broker:
+
+    image: confluentinc/cp-kafka:7.0.1
+
+    container_name: broker
+
+    ports:
+
+    # To learn about configuring Kafka for access across networks see
+
+    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+
+      - "9092:9092"
+
+    depends_on:
+
+      - zookeeper
+
+    environment:
+
+      KAFKA_BROKER_ID: 1
+
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+
+*ссылка на файл (Git): https://github.com/anatoliyse/Kafka/tree/main/KafkaDockerCompose
+
+
+
+2. Запуск Kafka broker
+
+В директории, содержащей файл docker-compose.yml, созданный на предыдущем шаге, запустите команду, чтобы запустить все службы в заданном порядке:
+
+команда:
+
+sudo docker-compose up -d
+
+команда:
+
+docker exec broker kafka-topics --bootstrap-server broker:9095 --create --topic test_first
+
+
+
+3. Заполнение топика сообщением
+
+Для заполнения топика сообщением используем команду:
+
+docker exec --interactive --tty broker kafka-console-producer --bootstrap-server broker:9095 --topic test_first
+
+После запуска команды напишите любой текст, который желаете передать в сообщении.
+
+Например:
+
+Это мой первый подход к Кафке.
+
+Посмотрим, что это за зверь
+
+Альтернативный вариант команды для запуска
+
+kafkacat -b localhost:9095 -t test -P
+
+
+
+4. Чтение сообщений из kafka
+
+для просмотра сообщения
+
+После того как мы записали сообщение в тему, чтобы просмотреть данное сообщение запустите 2-е окно терминала и введите команду:
+
+docker exec --interactive --tty broker kafka-console-consumer --bootstrap-server broker:9095 --topic test_first --from-beginning
+
+Альтернативный вариант команды:
+
+kafkacat -b localhost:9095 -t test_first -C
+
+Вы должны увидеть набранный вами текст
+
+
+
+5. Остановка kafka broker
+
+Для остановки брокера kafka используем команду:
+
+docker-compose down
+
+
+
+
+
+Задача для желающих узнать больше.
+
+Аналогичную процедуру можно реализовать через специальную библиотеку KafkaConsumer
+
+Выполняем пункты 1 и 2 из предыдущих заданий.
+Запустите пример Python скрипта, представленном по ссылке: (kafka-python), предварительно сконфигурировав порт и название вашего топика, который вы собираетесь слушать/мониторить.
+https://kafka-python.readthedocs.io/en/master/usage.html
+Дополнительное задание:
+
+Для вызова kafka из python предлагается выполнить задание из Репозитория (Git): https://github.com/anatoliyse/Kafka/tree/main/LAB1
+
+Задание:
+
+Ознакомитесь с кодом.
+Запустите скрипты.
+Команды в помощь:
+
+docker-compose up --build
+
+pip install kafka-python
+
+python producer.py
+
+python consumer.py
+
+
+
+Приложите скриншоты выполненных работ с запуском, остановкой, с заполнением и чтением сообщений в Kafka.
+
+Отправьте файл с выполненной практической работой (в следующем пункте). Формат: Свободный - Google Doc, Word.
+
+Настройка elasticsearch + kafka: https://dev.to/yanpiing/observabilidade-com-kafka-connect-e-elasticsearch-30lb
