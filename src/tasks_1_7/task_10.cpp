@@ -5,29 +5,6 @@
 
 using namespace std;
 
-float avg(vector<int> values)
-{
-    if (values.empty())
-        return 0;
-
-    int sum = 0;
-    for(int i = 0; i < values.size(); i++)
-    {
-        sum += values[i];
-    }
-
-    auto const count = static_cast<float>(values.size());
-
-    return sum / count;
-}
-
-string timeToString(time_t *time)
-{
-    stringstream steam;
-    steam << put_time(localtime(time), "%d.%m.%Y %H:%M");
-    return steam.str();
-}
-
 class Train
 {
     public:
@@ -48,6 +25,13 @@ class Train
             this->trainNumber = number;
         }
 };
+
+string timeToString(time_t *time)
+{
+    stringstream steam;
+    steam << put_time(localtime(time), "%d.%m.%Y %H:%M");
+    return steam.str();
+}
 
 time_t getTime(tm time)
 {
